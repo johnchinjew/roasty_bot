@@ -88,7 +88,16 @@ int main() {
     "Cruisin' down the street in my ultra _.",
     "Literally, nothing can stop my super _.",
     "You tryna be that _, but you only be a _.",
-    "We're JARBCO, kicking _ and chewing _."
+    "We're JARBCO, kicking _ and chewing _.",
+    "Nothing can hold me down, I'm the top of the _.",
+    "Everyone looks up to me, you and your _.",
+    "Cruising down the street in the hood with my _.",
+    "I stole your _, Now Imma steal your _.",
+    "Got so many chains on my neck call me a _.",
+    "Got so many likes on the gram like a _.",
+    "Everyone you know calls me the _.",
+    "Always taking a vacation, down at the _.",
+    "I'm the king of _, you might as well be a _."
   };
 
   clear();
@@ -116,7 +125,7 @@ int main() {
       word_to_rhyme = extract_last_word(first_line);
       rhymes = get_rhymes(word_to_rhyme);
       prompt_msg = "Try something else: ";
-    } while (rhymes.size() < 10 || first_line.length() < 15);
+    } while (rhymes.size() < 10);
 
     slow_print("\nGenerating rhymes...", true, 35, 400);
     slow_print("Mixing tapes...", true, 35, 400);
@@ -130,7 +139,7 @@ int main() {
     cout << "+ —— —— —— —— —— —— —— —— —— +\n";
 
     slow_print("\n"+format_sentence(first_line));
-    for (int i = 0; i < 8; i++) slow_print(make_line(lines, rhymes));
+    for (int i = 0; i < 7; i++) slow_print(make_line(lines, rhymes));
 
     prompt_msg = "\nGive me another line: ";
   }
@@ -247,16 +256,17 @@ string make_line(const vector<string> lines, const vector<string> rhymes) {
 	return l;
 }
 
-// Returns vector of rhymes for a given word @keyword.
+// Returns vector of rhymes for a given word @k.
 // Sends a get request to api.datamuse.com, and processes response.
 // Also uses the C++ Requests library (github.com/whoshuu/cpr).
-vector<string> get_rhymes(const string keyword) {
+vector<string> get_rhymes(const string k) {
   vector<string> rhymes;
-  auto r = Get(Url{ "https://api.datamuse.com/words?rel_rhy="+keyword });
-  if (r.status_code != 200) {
+  auto r1 = Get(Url{"https://api.datamuse.com/words?rel_rhy="+k});
+  auto r2 = Get(Url{"https://api.datamuse.com/words?rel_nry="+k+"&max=30"});
+  if (r1.status_code != 200 && r2.status_code != 200) {
     cout << "Error! Problem getting rhymes from server." << endl;
   } else {
-    string raw_rhymes = r.text;
+    string raw_rhymes = r1.text + r2.text;
     if (raw_rhymes.length() <= 2) return rhymes;
     int pos = 0;
     while (true) {
